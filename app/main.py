@@ -4,11 +4,13 @@ Employee Attendance & Analytics API
 Run:  uvicorn app.main:app --port 8000
 Env:  MONGO_URI, MONGO_DB  (a local .env is loaded for convenience)
 """
+import json
 import os
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Optional
 
+from bson import json_util
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
@@ -1803,7 +1805,11 @@ def explain_endpoint(
             },
             verbosity="executionStats",
         )
-        return {"endpoint": endpoint, "collection": "attendance_logs", "explain": explain_result}
+        return {
+            "endpoint": endpoint,
+            "collection": "attendance_logs",
+            "explain": json.loads(json_util.dumps(explain_result)),
+        }
 
     elif endpoint == "employee_monthly":
         if not month:
@@ -1823,7 +1829,11 @@ def explain_endpoint(
             {"aggregate": "attendance_logs", "pipeline": pipeline, "cursor": {}},
             verbosity="executionStats",
         )
-        return {"endpoint": endpoint, "collection": "attendance_logs", "explain": explain_result}
+        return {
+            "endpoint": endpoint,
+            "collection": "attendance_logs",
+            "explain": json.loads(json_util.dumps(explain_result)),
+        }
 
     elif endpoint == "department_summary":
         if not month:
@@ -1839,7 +1849,11 @@ def explain_endpoint(
             {"aggregate": "attendance_logs", "pipeline": pipeline, "cursor": {}},
             verbosity="executionStats",
         )
-        return {"endpoint": endpoint, "collection": "attendance_logs", "explain": explain_result}
+        return {
+            "endpoint": endpoint,
+            "collection": "attendance_logs",
+            "explain": json.loads(json_util.dumps(explain_result)),
+        }
 
     elif endpoint == "late_leaderboard":
         if not month:
@@ -1857,7 +1871,11 @@ def explain_endpoint(
             {"aggregate": "attendance_logs", "pipeline": pipeline, "cursor": {}},
             verbosity="executionStats",
         )
-        return {"endpoint": endpoint, "collection": "attendance_logs", "explain": explain_result}
+        return {
+            "endpoint": endpoint,
+            "collection": "attendance_logs",
+            "explain": json.loads(json_util.dumps(explain_result)),
+        }
 
     elif endpoint == "department_trend":
         if not from_date or not to_date:
@@ -1872,4 +1890,8 @@ def explain_endpoint(
             {"aggregate": "attendance_logs", "pipeline": pipeline, "cursor": {}},
             verbosity="executionStats",
         )
-        return {"endpoint": endpoint, "collection": "attendance_logs", "explain": explain_result}
+        return {
+            "endpoint": endpoint,
+            "collection": "attendance_logs",
+            "explain": json.loads(json_util.dumps(explain_result)),
+        }
