@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.errors import DuplicateKeyError
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -361,6 +362,332 @@ class RegularizeIn(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def index_ui():
+    """Clean interactive landing portal for the Employee Attendance API."""
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attendance & Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #090d16;
+            --card: rgba(17, 24, 39, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #10b981;
+            --badge-bg: rgba(79, 70, 229, 0.15);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1080px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .badge {
+            background: var(--badge-bg);
+            color: #818cf8;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: 1px solid rgba(129, 140, 248, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-top: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            margin-top: 0.35rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .btn {
+            padding: 0.65rem 1.25rem;
+            border-radius: 0.65rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.35);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .endpoint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.75rem;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .method {
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.35rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .method-get { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .method-post { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .method-patch { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .path { color: #e2e8f0; text-decoration: none; }
+        .path:hover { color: #818cf8; text-decoration: underline; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+            margin-top: 0.25rem;
+        }
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-sub);
+        }
+        footer {
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <span class="badge"><span class="badge-dot"></span> System Live & Connected</span>
+                <h1>Employee Attendance & Analytics</h1>
+                <p class="subtitle">FastAPI attendance engine backed by MongoDB Atlas aggregation pipelines</p>
+            </div>
+            <div class="nav-links">
+                <a href="/docs" class="btn btn-primary">⚡ Open Swagger Docs</a>
+                <a href="/redoc" class="btn btn-secondary">📖 View ReDoc</a>
+                <a href="/health" class="btn btn-secondary" target="_blank">💚 Health</a>
+            </div>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">API Status</div>
+                <div class="metric-value" style="color: #34d399;">Ready 200</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Database Engine</div>
+                <div class="metric-value">MongoDB Atlas</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Timezone Calculation</div>
+                <div class="metric-value">IST (UTC+5:30)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Audit Regularization</div>
+                <div class="metric-value">Active (R1-R10)</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">👥</div>
+                    <div>
+                        <div class="card-title">Employee Management</div>
+                        <div style="font-size: 0.8rem; color: var(--text-sub);">Staff registry & lookups</div>
+                    </div>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/employees" target="_blank">/employees</a>
+                    <span class="method method-get">GET</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="path">/employees</span>
+                    <span class="method method-post">POST</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">⏱️</div>
+                    <div>
+                        <div class="card-title">Punch & Regularization</div>
+                        <div style="font-size: 0.8rem; color: var(--text-sub);">Check-ins, check-outs & audits</div>
+                    </div>
+                </div>
+                <div class="endpoint-item">
+                    <span class="path">/attendance/punch-in</span>
+                    <span class="method method-post">POST</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="path">/attendance/punch-out</span>
+                    <span class="method method-post">POST</span>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/attendance" target="_blank">/attendance</a>
+                    <span class="method method-get">GET</span>
+                </div>
+                <div class="endpoint-item">
+                    <span class="path">/attendance/{emp_code}/{date}</span>
+                    <span class="method method-patch">PATCH</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">📊</div>
+                    <div>
+                        <div class="card-title">Analytics & Aggregations</div>
+                        <div style="font-size: 0.8rem; color: var(--text-sub);">MongoDB pipelines with zero-log handling</div>
+                    </div>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/analytics/departments/summary?month=2026-07" target="_blank">/analytics/departments/summary</a>
+                    <span class="method method-get">GET</span>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/analytics/leaderboard/late?month=2026-07" target="_blank">/analytics/leaderboard/late</a>
+                    <span class="method method-get">GET</span>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/analytics/employees/EMP0001/monthly?month=2026-07" target="_blank">/analytics/employees/{code}/monthly</a>
+                    <span class="method method-get">GET</span>
+                </div>
+                <div class="endpoint-item">
+                    <a class="path" href="/analytics/departments/Engineering/trend?from=2026-07-06&to=2026-07-10" target="_blank">/analytics/departments/{dept}/trend</a>
+                    <span class="method method-get">GET</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Crafted for Employee Attendance & Analytics Evaluation &bull; Powered by FastAPI & MongoDB
+        </footer>
+    </div>
+</body>
+</html>"""
+
 
 @app.get("/health")
 def health():
