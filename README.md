@@ -60,11 +60,11 @@ Once the server is running, open:
 
 ## Loading sample data
 
+If using the starter kit test data:
 ```bash
 python sample_seed.py
 ```
-
-This seeds the six sample employees and nine attendance log documents from `sample_data/`.
+This loads the sample employees and attendance logs into the configured MongoDB database.
 
 ## Testing
 

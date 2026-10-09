@@ -20,7 +20,8 @@ load_dotenv()
 # ---------------------------------------------------------------------------
 # Database setup
 # ---------------------------------------------------------------------------
-client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
+mongo_uri = os.getenv("MONGO_URI") or os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+client = MongoClient(mongo_uri)
 db = client[os.getenv("MONGO_DB", "attendance_db")]
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -948,7 +949,7 @@ def department_summary(
                 "as": "emp",
             }
         },
-        {"$unwind": {"path": "$emp", "preserveNullAndEmpty": False}},
+        {"$unwind": "$emp"},
     ]
 
     if department:
@@ -1177,7 +1178,7 @@ def department_trend(
                 "as": "emp",
             }
         },
-        {"$unwind": {"path": "$emp", "preserveNullAndEmpty": False}},
+        {"$unwind": "$emp"},
         {"$match": {"emp.department": department}},
         {
             "$group": {
