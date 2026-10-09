@@ -365,324 +365,483 @@ class RegularizeIn(BaseModel):
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def index_ui():
-    """Clean interactive landing portal for the Employee Attendance API."""
+    """Enterprise engineering dashboard for Employee Attendance & Analytics API."""
     return """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Attendance & Analytics</title>
+    <title>Employee Attendance & Analytics Service</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #090d16;
-            --card: rgba(17, 24, 39, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --accent: #10b981;
-            --badge-bg: rgba(79, 70, 229, 0.15);
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-subtle: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --brand-primary: #0284c7;
+            --brand-primary-hover: #0369a1;
+            --status-active: #059669;
+            --status-active-bg: #ecfdf5;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.2) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 2.5rem 1.5rem;
-            display: flex;
-            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-        .container {
-            width: 100%;
-            max-width: 1080px;
+
+        .header-bar {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.875rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        header {
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
-        .badge {
-            background: var(--badge-bg);
-            color: #818cf8;
-            padding: 0.35rem 0.85rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            border: 1px solid rgba(129, 140, 248, 0.25);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
-        }
-        h1 {
-            font-size: 2.25rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-top: 0.5rem;
-            background: linear-gradient(to right, #ffffff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p.subtitle {
-            color: var(--text-sub);
-            font-size: 0.95rem;
-            margin-top: 0.35rem;
-        }
-        .nav-links {
+
+        .brand-cluster {
             display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            background: #0f172a;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.875rem;
+            letter-spacing: -0.05em;
+        }
+
+        .brand-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-version {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.35rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
             gap: 0.75rem;
         }
+
         .btn {
-            padding: 0.65rem 1.25rem;
-            border-radius: 0.65rem;
-            font-size: 0.875rem;
-            font-weight: 600;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease-in-out;
             display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            background: var(--bg-surface);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--border-hover);
+            background: #f8fafc;
+        }
+
+        .btn-solid {
+            background: #0f172a;
+            color: #ffffff;
+            border: 1px solid #0f172a;
+        }
+
+        .btn-solid:hover {
+            background: #1e293b;
+        }
+
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .status-strip {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1.25rem 1.75rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .status-label {
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .status-val-wrap {
+            display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+
+        .indicator-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--status-active);
         }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+
+        .status-val {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-heading);
         }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid var(--border);
+
+        .section-header {
+            margin-bottom: 1rem;
         }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
         }
-        .grid {
+
+        .section-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 1.25rem;
             margin-bottom: 2.5rem;
         }
-        .card {
-            background: var(--card);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
+
+        .panel-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
             padding: 1.5rem;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: box-shadow 0.15s ease, border-color 0.15s ease;
         }
-        .card:hover {
-            border-color: rgba(99, 102, 241, 0.35);
-            transform: translateY(-2px);
+
+        .panel-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.04);
         }
-        .card-header {
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 0.75rem;
+        }
+
+        .panel-name {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+
+        .panel-tag {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .route-row {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            justify-content: space-between;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78125rem;
         }
-        .icon {
-            width: 38px;
-            height: 38px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            border: 1px solid var(--border);
+
+        .route-link {
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        .card-title {
-            font-size: 1.1rem;
+
+        .route-link:hover {
+            color: var(--brand-primary);
+            text-decoration: underline;
+        }
+
+        .http-badge {
+            font-size: 0.6875rem;
             font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
         }
-        .endpoint-item {
+
+        .badge-get { background: #e0f2fe; color: #0369a1; }
+        .badge-post { background: #dcfce7; color: #15803d; }
+        .badge-patch { background: #fef3c7; color: #b45309; }
+
+        .rules-reference {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .rule-card {
+            border-left: 3px solid #cbd5e1;
+            padding-left: 0.875rem;
+        }
+
+        .rule-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin-bottom: 0.2rem;
+        }
+
+        .rule-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 1.5rem 0 2rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.6rem 0.75rem;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        .method {
-            padding: 0.2rem 0.5rem;
-            border-radius: 0.35rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-        .method-get { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .method-post { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-        .method-patch { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-        .path { color: #e2e8f0; text-decoration: none; }
-        .path:hover { color: #818cf8; text-decoration: underline; }
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 2rem;
         }
-        .metric-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            text-align: center;
+
+        .repo-link {
+            color: var(--text-heading);
+            font-weight: 500;
+            text-decoration: none;
         }
-        .metric-value {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #fff;
-            margin-top: 0.25rem;
-        }
-        .metric-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-sub);
-        }
-        footer {
-            text-align: center;
-            color: var(--text-sub);
-            font-size: 0.85rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
+
+        .repo-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div>
-                <span class="badge"><span class="badge-dot"></span> System Live & Connected</span>
-                <h1>Employee Attendance & Analytics</h1>
-                <p class="subtitle">FastAPI attendance engine backed by MongoDB Atlas aggregation pipelines</p>
+    <header class="header-bar">
+        <div class="header-inner">
+            <div class="brand-cluster">
+                <div class="brand-mark">EA</div>
+                <div class="brand-title">Employee Attendance & Analytics Service <span class="brand-version">v2.0.0</span></div>
             </div>
-            <div class="nav-links">
-                <a href="/docs" class="btn btn-primary">⚡ Open Swagger Docs</a>
-                <a href="/redoc" class="btn btn-secondary">📖 View ReDoc</a>
-                <a href="/health" class="btn btn-secondary" target="_blank">💚 Health</a>
-            </div>
-        </header>
+            <nav class="header-actions">
+                <a href="/docs" class="btn btn-solid">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Interactive API Docs
+                </a>
+                <a href="/redoc" class="btn btn-outline">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    ReDoc Reference
+                </a>
+                <a href="/health" class="btn btn-outline" target="_blank">Health Check</a>
+            </nav>
+        </div>
+    </header>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">API Status</div>
-                <div class="metric-value" style="color: #34d399;">Ready 200</div>
+    <div class="main-wrapper">
+        <div class="status-strip">
+            <div class="status-col">
+                <span class="status-label">Service Health</span>
+                <div class="status-val-wrap">
+                    <span class="indicator-dot"></span>
+                    <span class="status-val">Operational</span>
+                </div>
             </div>
-            <div class="metric-card">
-                <div class="metric-label">Database Engine</div>
-                <div class="metric-value">MongoDB Atlas</div>
+            <div class="status-col">
+                <span class="status-label">Database Connection</span>
+                <div class="status-val">MongoDB Atlas Cluster</div>
             </div>
-            <div class="metric-card">
-                <div class="metric-label">Timezone Calculation</div>
-                <div class="metric-value">IST (UTC+5:30)</div>
+            <div class="status-col">
+                <span class="status-label">Timezone Calculation</span>
+                <div class="status-val">IST (UTC+05:30)</div>
             </div>
-            <div class="metric-card">
-                <div class="metric-label">Audit Regularization</div>
-                <div class="metric-value">Active (R1-R10)</div>
+            <div class="status-col">
+                <span class="status-label">Compliance</span>
+                <div class="status-val">HROne Contract 2.0</div>
             </div>
         </div>
 
-        <div class="grid">
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon">👥</div>
-                    <div>
-                        <div class="card-title">Employee Management</div>
-                        <div style="font-size: 0.8rem; color: var(--text-sub);">Staff registry & lookups</div>
-                    </div>
+        <div class="section-header">
+            <h2 class="section-title">API Endpoints Directory</h2>
+            <p class="section-subtitle">Live endpoint routes adhering strictly to openapi.yaml specifications</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span class="panel-name">Employee Management</span>
+                    <span class="panel-tag">Directory</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/employees" target="_blank">/employees</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/employees" target="_blank">/employees</a>
+                    <span class="http-badge badge-get">GET</span>
                 </div>
-                <div class="endpoint-item">
-                    <span class="path">/employees</span>
-                    <span class="method method-post">POST</span>
+                <div class="route-row">
+                    <span class="route-link">/employees</span>
+                    <span class="http-badge badge-post">POST</span>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon">⏱️</div>
-                    <div>
-                        <div class="card-title">Punch & Regularization</div>
-                        <div style="font-size: 0.8rem; color: var(--text-sub);">Check-ins, check-outs & audits</div>
-                    </div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span class="panel-name">Attendance & Regularization</span>
+                    <span class="panel-tag">Core Engine</span>
                 </div>
-                <div class="endpoint-item">
-                    <span class="path">/attendance/punch-in</span>
-                    <span class="method method-post">POST</span>
+                <div class="route-row">
+                    <span class="route-link">/attendance/punch-in</span>
+                    <span class="http-badge badge-post">POST</span>
                 </div>
-                <div class="endpoint-item">
-                    <span class="path">/attendance/punch-out</span>
-                    <span class="method method-post">POST</span>
+                <div class="route-row">
+                    <span class="route-link">/attendance/punch-out</span>
+                    <span class="http-badge badge-post">POST</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/attendance" target="_blank">/attendance</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/attendance" target="_blank">/attendance</a>
+                    <span class="http-badge badge-get">GET</span>
                 </div>
-                <div class="endpoint-item">
-                    <span class="path">/attendance/{emp_code}/{date}</span>
-                    <span class="method method-patch">PATCH</span>
+                <div class="route-row">
+                    <span class="route-link">/attendance/{emp_code}/{date}</span>
+                    <span class="http-badge badge-patch">PATCH</span>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon">📊</div>
-                    <div>
-                        <div class="card-title">Analytics & Aggregations</div>
-                        <div style="font-size: 0.8rem; color: var(--text-sub);">MongoDB pipelines with zero-log handling</div>
-                    </div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span class="panel-name">Analytics & Reporting</span>
+                    <span class="panel-tag">Aggregation</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/analytics/departments/summary?month=2026-07" target="_blank">/analytics/departments/summary</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/analytics/departments/summary?month=2026-07" target="_blank">/analytics/departments/summary</a>
+                    <span class="http-badge badge-get">GET</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/analytics/leaderboard/late?month=2026-07" target="_blank">/analytics/leaderboard/late</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/analytics/leaderboard/late?month=2026-07" target="_blank">/analytics/leaderboard/late</a>
+                    <span class="http-badge badge-get">GET</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/analytics/employees/EMP0001/monthly?month=2026-07" target="_blank">/analytics/employees/{code}/monthly</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/analytics/employees/EMP0001/monthly?month=2026-07" target="_blank">/analytics/employees/{code}/monthly</a>
+                    <span class="http-badge badge-get">GET</span>
                 </div>
-                <div class="endpoint-item">
-                    <a class="path" href="/analytics/departments/Engineering/trend?from=2026-07-06&to=2026-07-10" target="_blank">/analytics/departments/{dept}/trend</a>
-                    <span class="method method-get">GET</span>
+                <div class="route-row">
+                    <a class="route-link" href="/analytics/departments/Engineering/trend?from=2026-07-06&to=2026-07-10" target="_blank">/analytics/departments/{dept}/trend</a>
+                    <span class="http-badge badge-get">GET</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="rules-reference">
+            <h3 style="font-size: 0.9375rem; font-weight: 600; color: var(--text-heading);">Business Rules Compliance Engine (R1–R10)</h3>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-title">R1 Timezone & Overnight</div>
+                    <div class="rule-desc">Calendar dates bound to IST (UTC+05:30). Overnight shift morning tails associate with start day.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">R2 Grace Period</div>
+                    <div class="rule-desc">10-minute threshold; punch-in is late strictly after 10:00 elapsed from shift start.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">R3 Overtime & Threshold</div>
+                    <div class="rule-desc">Overtime logged only when shift extension reaches or exceeds 30 minutes.</div>
+                </div>
+                <div class="rule-card">
+                    <div class="rule-title">R4 Half-Up Decimal Rounding</div>
+                    <div class="rule-desc">Strict ROUND_HALF_UP arithmetic (2 decimals for hours, 4 decimals for rates).</div>
                 </div>
             </div>
         </div>
 
         <footer>
-            Crafted for Employee Attendance & Analytics Evaluation &bull; Powered by FastAPI & MongoDB
+            <div>Employee Attendance & Analytics API &bull; Python, FastAPI & MongoDB</div>
+            <div>
+                <a href="https://github.com/MusaleTejas/Employee-Attendance" class="repo-link" target="_blank">View GitHub Repository</a>
+            </div>
         </footer>
     </div>
 </body>
