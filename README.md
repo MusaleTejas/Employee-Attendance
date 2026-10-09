@@ -51,9 +51,27 @@ uvicorn app.main:app --port 8000
 
 Indexes are created automatically at startup (idempotent).
 
+## Live Deployment
+
+- **Live Service & Web UI**: [https://employee-attendance-f5o7.onrender.com](https://employee-attendance-f5o7.onrender.com)
+- **Interactive Swagger Documentation**: [https://employee-attendance-f5o7.onrender.com/docs](https://employee-attendance-f5o7.onrender.com/docs)
+- **ReDoc Technical Specification**: [https://employee-attendance-f5o7.onrender.com/redoc](https://employee-attendance-f5o7.onrender.com/redoc)
+
+## API Screenshots
+
+### Interactive Swagger UI (`/docs`)
+![Swagger UI Screenshot](screenshots/Employee%20Attendance%20%26%20Analytics%20API%20(2.0.0).png)
+
+The Swagger interface provides interactive testing for all employee, attendance, and analytics endpoints. Developers can inspect schemas, provide parameters, and execute live queries directly against MongoDB.
+
+### ReDoc Specification (`/redoc`)
+![ReDoc Screenshot](screenshots/redoc.png)
+
+The ReDoc view renders a structured, responsive documentation portal generated from the OpenAPI specification. It outlines model schemas, parameters, error formats, and response codes in a clean multi-column layout.
+
 ## API documentation
 
-Once the server is running, open:
+Once the server is running locally, open:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
